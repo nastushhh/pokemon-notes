@@ -16,6 +16,7 @@ public class Pokemon {
     private String type;
     private String mood;
     private String ability;
+    @Column(columnDefinition = "TEXT")
     private String image;
 
     public Pokemon() {}

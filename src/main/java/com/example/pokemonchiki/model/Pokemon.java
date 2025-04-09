@@ -2,16 +2,12 @@ package com.example.pokemonchiki.model;
 
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "pokemonchiki")
 public class Pokemon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     private String name;
     private String mood;
     private String color;
@@ -25,20 +21,20 @@ public class Pokemon {
         this.mood = mood;
         this.color = color;
         this.image = image;
-
     }
-    public Integer getId() { return id;}
-    public void setId(int id) { this.id = id;}
 
-    public String getName () {return name;}
-    public void setName (String name) { this.name = name;}
+    public Integer getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public String getMood() {return mood;}
-    public void setMood (String mood) {this.mood = mood;}
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getColor() {return color;}
-    public void setColor (String color) {this.color = color;}
+    public String getMood() { return mood; }
+    public void setMood(String mood) { this.mood = mood; }
 
-    public String getImage() {return image;}
-    public void setImage (String image) {this.image = image;}
+    public String getColor() { return color; }
+    public void setColor(String color) { this.color = color; }
+
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 }

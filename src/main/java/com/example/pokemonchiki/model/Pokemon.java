@@ -15,7 +15,7 @@ public class Pokemon {
     private String name;
     private String type;
     private String mood;
-    private String ability;
+    private String color;
     @Column(columnDefinition = "TEXT")
     private String image;
 
@@ -25,7 +25,7 @@ public class Pokemon {
         this.name = name;
         this.type = type;
         this.mood = mood;
-        this.ability = ability;
+        this.color = color;
         this.image = image;
 
     }
@@ -41,8 +41,8 @@ public class Pokemon {
     public String getMood() {return mood;}
     public void setMood (String mood) {this.mood = mood;}
 
-    public String getAbility() {return ability;}
-    public void setAbility (String ability) {this.ability = ability;}
+    public String getColor() {return color;}
+    public void setColor (String color) {this.color = color;}
 
     public String getImage() {return image;}
     public void setImage (String image) {this.image = image;}

@@ -12,7 +12,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -27,12 +30,20 @@ public class PokemonService {
     private final NoteService noteService;
 
     private final ObjectMapper mapper = new ObjectMapper();
+    private static final String IMAGE_DIR = "src/main/resources/static/images/";
+    private static final String BASE_URL = "http://localhost:8080/images/";
 
     @Autowired
     public PokemonService(PokemonRepository pokemonRepository, GigaChatService gigaChatService, NoteService noteService) {
         this.pokemonRepository = pokemonRepository;
         this.gigaChatService = gigaChatService;
         this.noteService = noteService;
+
+        File dir = new File(IMAGE_DIR);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
     }
 
     public Pokemon savePokemon(Pokemon pokemon) {
@@ -82,7 +93,8 @@ public class PokemonService {
             throw new IOException("Не удалось скачать изображение от GigaChat");
         }
 
-        moodPokemon.setImage(imageBase64);
+        String imageUrl = saveImgToFile(imageBase64, name);
+        moodPokemon.setImage(imageUrl);
 
         Pokemon savedPokemon = pokemonRepository.save(moodPokemon);
 
@@ -90,6 +102,19 @@ public class PokemonService {
         noteService.updateNote(note);
 
         return savedPokemon;
+    }
+
+    private String saveImgToFile(String imageBase64, String pokemonName) throws IOException {
+        String base64Data = imageBase64.replaceFirst("^data:image/[^;]+;base64,", "");
+        byte[] imageBytes = Base64.getDecoder().decode(base64Data);
+
+        String fileName = pokemonName + "_" + System.currentTimeMillis() + ".jpg";
+        String filePath = IMAGE_DIR + fileName;
+
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            fos.write(imageBytes);
+        }
+        return BASE_URL + filePath;
     }
 
     private String generateImage(String prompt) throws IOException {

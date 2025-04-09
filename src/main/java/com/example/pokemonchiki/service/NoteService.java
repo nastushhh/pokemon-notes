@@ -19,7 +19,6 @@ import java.util.Optional;
 public class NoteService {
 
     private static final Logger logger = LoggerFactory.getLogger(NoteService.class);
-
     private final NoteRepository noteRepository;
     private final GigaChatService gigaChatService;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -32,7 +31,6 @@ public class NoteService {
 
     private String analyzeText(String text) throws IOException {
         String token = gigaChatService.getToken();
-
         ObjectNode requestJson = mapper.createObjectNode();
         requestJson.put("model", "GigaChat");
 
@@ -83,43 +81,33 @@ public class NoteService {
         if (content.length() > 1000) {
             throw new IllegalArgumentException("Текст заметки слишком длинный, максимум 1000 символов");
         }
-
         String mood = analyzeText(content);
-        Note note = new Note(content, mood, null); // Не привязываем покемона
+        Note note = new Note(content, mood, null); // Без покемона при создании
         Note savedNote = noteRepository.save(note);
         logger.info("Сохранена заметка с id {} и настроением {}", savedNote.getId(), mood);
         return savedNote;
     }
 
+    public Note updateNote(Note note) {
+        Note updatedNote = noteRepository.save(note);
+        logger.info("Обновлена заметка с id {} с покемоном id {}", updatedNote.getId(),
+                updatedNote.getPokemon() != null ? updatedNote.getPokemon().getId() : null);
+        return updatedNote;
+    }
+
     public String analyzeNoteMood(String content) throws IOException {
-        if (content == null || content.trim().isEmpty()) {
-            throw new IllegalArgumentException("Текст заметки не может быть пустым");
-        }
         return analyzeText(content);
     }
 
     public List<Note> getAllNotes() {
-        List<Note> notes = noteRepository.findAll();
-        logger.info("Получено {} заметок", notes.size());
-        return notes;
+        return noteRepository.findAll();
     }
 
     public Optional<Note> getNote(Integer id) {
-        Optional<Note> note = noteRepository.findById(id);
-        if (note.isPresent()) {
-            logger.info("Найдена заметка с ID {}", id);
-        } else {
-            logger.warn("Заметка с ID {} не найдена", id);
-        }
-        return note;
+        return noteRepository.findById(id);
     }
 
     public void deleteNote(Integer id) {
-        if (!noteRepository.existsById(id)) {
-            logger.warn("Попытка удалить несуществующую заметку с ID {}", id);
-            throw new IllegalArgumentException("Заметка с ID " + id + " не найдена");
-        }
         noteRepository.deleteById(id);
-        logger.info("Удалена заметка с ID {}", id);
     }
 }

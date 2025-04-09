@@ -31,11 +31,22 @@ public class PokemonController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<Pokemon> generatePokemon(@RequestBody String mood) throws Exception {
+    public ResponseEntity<Pokemon> generatePokemon(@RequestBody String json) throws Exception {
+        String mood = extractField(json, "mood");
+        String name = extractField(json, "name");
+        String color = extractField(json, "color");
+
         if (mood == null || mood.trim().isEmpty()) {
             throw new IllegalArgumentException("Настроение не может быть пустым");
         }
-        Pokemon pokemon = pokemonService.generatePokemon(mood);
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Имя не может быть пустым");
+        }
+        if (color == null || color.trim().isEmpty()) {
+            throw new IllegalArgumentException("Цвет не может быть пустым");
+        }
+
+        Pokemon pokemon = pokemonService.generatePokemon(mood, name, color);
         return new ResponseEntity<>(pokemon, HttpStatus.CREATED);
     }
 
@@ -56,5 +67,11 @@ public class PokemonController {
     public ResponseEntity<Void> deletePokemonById(@PathVariable Integer id) {
         pokemonService.deletePokemon(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    private String extractField(String json, String field) {
+        String pattern = "\"" + field + "\":\\s*\"([^\"]+)\"";
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile(pattern).matcher(json);
+        return matcher.find() ? matcher.group(1) : null;
     }
 }

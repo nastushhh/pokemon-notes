@@ -10,44 +10,31 @@ public class Note {
     private Integer id;
 
     @Column(columnDefinition = "TEXT")
-    private String note;
+    private String content;
+
     private String mood;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "pokemon_id", referencedColumnName = "id")
     private Pokemon pokemon;
 
     public Note() {}
 
-    public Note (String note, String mood, Pokemon pokemon) {
-        this.note = note;
+    public Note(String content, String mood, Pokemon pokemon) {
+        this.content = content;
         this.mood = mood;
         this.pokemon = pokemon;
     }
 
-    public Integer getId(){
-        return id;
-    }
-    public void setId(Integer id){
-        this.id = id;
-    }
-    public String getNote(){
-        return note;
-    }
-    public void setNote(String note){
-        this.note = note;
-    }
-    public String getMood(){
-        return mood;
-    }
-    public void setMood(String mood) {
-        this.mood = mood;
-    }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
-    public Pokemon getPokemon(){
-        return pokemon;
-    }
-    public void setPokemon(Pokemon pokemon){
-        this.pokemon = pokemon;
-    }
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
+
+    public String getMood() { return mood; }
+    public void setMood(String mood) { this.mood = mood; }
+
+    public Pokemon getPokemon() { return pokemon; }
+    public void setPokemon(Pokemon pokemon) { this.pokemon = pokemon; }
 }

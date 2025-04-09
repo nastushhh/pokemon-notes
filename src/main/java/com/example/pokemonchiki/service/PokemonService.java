@@ -1,6 +1,7 @@
 package com.example.pokemonchiki.service;
 
 import com.example.pokemonchiki.model.Pokemon;
+import com.example.pokemonchiki.model.Note;
 import com.example.pokemonchiki.repository.PokemonRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,12 +24,15 @@ public class PokemonService {
     private static final Logger logger = LoggerFactory.getLogger(PokemonService.class);
     private final PokemonRepository pokemonRepository;
     private final GigaChatService gigaChatService;
+    private final NoteService noteService;
+
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-    public PokemonService(PokemonRepository pokemonRepository, GigaChatService gigaChatService) {
+    public PokemonService(PokemonRepository pokemonRepository, GigaChatService gigaChatService, NoteService noteService) {
         this.pokemonRepository = pokemonRepository;
         this.gigaChatService = gigaChatService;
+        this.noteService = noteService;
     }
 
     public Pokemon savePokemon(Pokemon pokemon) {
@@ -47,14 +51,25 @@ public class PokemonService {
         pokemonRepository.deleteById(id);
     }
 
-    public Pokemon generatePokemon(String mood, String name, String color) throws IOException {
+    public Pokemon generatePokemon(String name, String color, Integer noteId) throws IOException {
+        Optional<Note> noteOpt = noteService.getNote(noteId);
+        if (noteOpt.isEmpty()) {
+            throw new IllegalArgumentException("Заметка с ID " + noteId + " не найдена");
+        }
+        Note note = noteOpt.get();
+
+        String mood = note.getMood();
+        if (mood == null || mood.trim().isEmpty()) {
+            throw new IllegalArgumentException("У заметки с ID " + noteId + "отсутствует настроение");
+        }
+
         Pokemon moodPokemon = new Pokemon();
         moodPokemon.setMood(mood);
         moodPokemon.setName(name);
         moodPokemon.setColor(color);
 
         String prompt = String.format(
-                "Создай уникального покемона в стиле Pokémon, который выглядит %s. Это призрачный тип с полупрозрачным телом, %s оттенками и светящимися милыми глазами. Фон обязательно должен быть полностью белым. Стиль: аниме.",
+                "Создай уникального покемона в стиле Pokémon, который выглядит %s. Это призрачный тип с полупрозрачным телом, %s оттенками и светящимися глазами, которые отражают настроение. Фон обязательно должен быть полностью белым. Стиль: аниме.",
                 mood, color);
 
         String imageId = generateImage(prompt);
@@ -69,7 +84,12 @@ public class PokemonService {
 
         moodPokemon.setImage(imageBase64);
 
-        return pokemonRepository.save(moodPokemon);
+        Pokemon savedPokemon = pokemonRepository.save(moodPokemon);
+
+        note.setPokemon(savedPokemon);
+        noteService.updateNote(note);
+
+        return savedPokemon;
     }
 
     private String generateImage(String prompt) throws IOException {

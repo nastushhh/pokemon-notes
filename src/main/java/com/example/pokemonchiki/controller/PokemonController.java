@@ -21,32 +21,30 @@ public class PokemonController {
         this.pokemonService = pokemonService;
     }
 
-    @PostMapping
-    public ResponseEntity<Pokemon> createPokemon(@RequestBody Pokemon pokemon) {
-        if (pokemon.getName() == null || pokemon.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Имя покемона не может быть пустым");
-        }
-        Pokemon savedPokemon = pokemonService.savePokemon(pokemon);
-        return new ResponseEntity<>(savedPokemon, HttpStatus.CREATED);
-    }
-
     @PostMapping("/generate")
     public ResponseEntity<Pokemon> generatePokemon(@RequestBody String json) throws Exception {
-        String mood = extractField(json, "mood");
         String name = extractField(json, "name");
         String color = extractField(json, "color");
+        String noteIdStr = extractField(json, "noteId");
 
-        if (mood == null || mood.trim().isEmpty()) {
-            throw new IllegalArgumentException("Настроение не может быть пустым");
-        }
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Имя не может быть пустым");
         }
         if (color == null || color.trim().isEmpty()) {
             throw new IllegalArgumentException("Цвет не может быть пустым");
         }
+        if (noteIdStr == null || noteIdStr.trim().isEmpty()) {
+            throw new IllegalArgumentException("ID заметки не может быть пустым");
+        }
 
-        Pokemon pokemon = pokemonService.generatePokemon(mood, name, color);
+        Integer noteId;
+        try {
+            noteId = Integer.parseInt(noteIdStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("ID заметки должен быть числом");
+        }
+
+        Pokemon pokemon = pokemonService.generatePokemon(name, color, noteId);
         return new ResponseEntity<>(pokemon, HttpStatus.CREATED);
     }
 

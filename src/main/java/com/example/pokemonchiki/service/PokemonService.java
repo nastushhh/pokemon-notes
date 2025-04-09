@@ -47,34 +47,28 @@ public class PokemonService {
         pokemonRepository.deleteById(id);
     }
 
-    public Pokemon generatePokemon(String mood) throws IOException {
+    public Pokemon generatePokemon(String mood, String name, String color) throws IOException {
         Pokemon moodPokemon = new Pokemon();
         moodPokemon.setMood(mood);
+        moodPokemon.setName(name);
+        moodPokemon.setColor(color);
 
-        // Формируем промпт для генерации изображения
         String prompt = String.format(
-                "Создай уникального покемона в стиле Pokémon, который выглядит %s. Это призрачный тип с полупрозрачным телом, темно-фиолетовыми оттенками и светящимися красными глазами. Фон обязательно должен быть полностью белым. Стиль: аниме.",
-                mood);
+                "Создай уникального покемона в стиле Pokémon, который выглядит %s. Это призрачный тип с полупрозрачным телом, %s оттенками и светящимися милыми глазами. Фон обязательно должен быть полностью белым. Стиль: аниме.",
+                mood, color);
 
-        // Отправляем запрос на генерацию изображения
         String imageId = generateImage(prompt);
         if (imageId == null) {
             throw new IOException("Не удалось получить идентификатор изображения от GigaChat");
         }
 
-        // Скачиваем изображение по идентификатору
         String imageBase64 = downloadImage(imageId);
         if (imageBase64 == null) {
             throw new IOException("Не удалось скачать изображение от GigaChat");
         }
 
-        // Устанавливаем поля покемона
-        moodPokemon.setName("Ghostly " + mood);
-        moodPokemon.setType("Ghost");
-        moodPokemon.setAbility("Phantom Glow");
         moodPokemon.setImage(imageBase64);
 
-        // Сохраняем покемона в базе данных
         return pokemonRepository.save(moodPokemon);
     }
 

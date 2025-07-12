@@ -1,32 +1,26 @@
-package com.example.pokemonchiki.model;
+package com.example.pokemonchiki.dto;
 
-import jakarta.persistence.*;
-
-@Entity
-@Table(name = "pokemonchiki")
-public class Pokemon {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class PokemonDto{
     private Integer id;
     private String name;
     private String mood;
     private String color;
-    @Column(columnDefinition = "TEXT")
-    private String image;
+    private String imageUrl;
 
-    public Pokemon() {}
+    public PokemonDto() {}
 
-    public Pokemon(String name, String mood, String color, String image) {
+    public PokemonDto(Integer id, String name, String mood, String color, String imageUrl) {
+        this.id = id;
         this.name = name;
         this.mood = mood;
         this.color = color;
-        this.image = image;
+        this.imageUrl = imageUrl;
     }
 
     public Integer getId() {
         return id;
     }
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -51,10 +45,10 @@ public class Pokemon {
         this.color = color;
     }
 
-    public String getImage() {
-        return image;
+    public String getImageUrl() {
+        return imageUrl;
     }
-    public void setImage(String image) {
-        this.image = image;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

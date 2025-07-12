@@ -1,0 +1,22 @@
+gigachat:
+  oauth-url: https://ngw.devices.sberbank.ru:9443/api/v2/oauth
+  api-url: https://gigachat.devices.sberbank.ru/api/v1/chat/completions
+  files-url: https://gigachat.devices.sberbank.ru/api/v1/files/%s/content
+  client-id: 3c4beafe-8dc5-407b-bab1-c415c5a74c4e
+  client-secret: 6d97866f-deab-4844-a707-5ec9879d0a2b
+  scope: GIGACHAT_API_PERS
+spring:
+  application:
+    name: pokemonchiki
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pokemonchiki
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+        ddl-auto: update
+    show-sql: true
+server:
+  port: 8081
